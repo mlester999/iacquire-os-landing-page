@@ -1,118 +1,116 @@
-# iAcquireOS demo registration integration contract
+# iAcquireOS demo registration integration
 
-## Boundary
+## Backend source of truth
 
-The marketing site owns only the public form and a same-origin Next.js server endpoint. The existing iAcquireOS application at `https://iacquire.online` remains the authority for prospects, verification, allocation, email delivery, demo activation, expiry, message quotas, return access, and administration.
+The landing integration is matched to `mlester999/iacquire-dashboard` `master` at commit `b82b241bdcd176bb67687fc2c501c176a2404e53`. The implementation is in [`registration.ts`](https://github.com/mlester999/iacquire-dashboard/blob/b82b241bdcd176bb67687fc2c501c176a2404e53/src/server/demo/registration.ts), with its route in [`route.ts`](https://github.com/mlester999/iacquire-dashboard/blob/b82b241bdcd176bb67687fc2c501c176a2404e53/src/app/api/public/demo/register/route.ts) and the full app-side contract in [`demo-external-registration.md`](https://github.com/mlester999/iacquire-dashboard/blob/b82b241bdcd176bb67687fc2c501c176a2404e53/docs/demo-external-registration.md).
 
-The application repository and credentials were not present in this workspace. The landing site therefore uses a configurable backend URL and does not claim that registration or email delivery is live.
+The landing browser posts only to `POST /api/demo/register` on this site. The Next.js server forwards a signed request to:
 
-## Landing endpoint
+`POST https://www.iacquire.online/api/public/demo/register`
 
-`POST /api/demo/register`
+The existing application owns prospect records, verification email delivery, verification, demo activation, message limits, return access, and expiry. The landing page does not create a second demo system.
 
-The browser sends same-origin JSON to this route:
+## Form fields and mapping
 
-```json
-{
-  "fullName": "Ada Lovelace",
-  "email": "ada@example.com",
-  "businessName": "Analytical Engines",
-  "industry": "B2B SaaS",
-  "marketingConsent": false,
-  "website": ""
-}
-```
+The form collects a name, work email, business name, industry, required acknowledgement of the demo privacy notice, and a separate optional marketing preference.
 
-`website` is a honeypot and must remain empty. Valid industry values are `B2B SaaS`, `Marketing or creative agency`, `Professional services`, `Home services`, `Ecommerce`, and `Other`. The server normalizes email to lowercase, validates field lengths and shape, rejects non-JSON and oversized payloads, requires a same-origin `Origin`, and returns no CORS headers.
+| Landing value | Backend field | Notes |
+| --- | --- | --- |
+| `fullName` | `name` | Trimmed and limited to 120 characters |
+| `email` | `email` | Lowercased before forwarding |
+| `businessName` | `business` | Trimmed and limited to 160 characters |
+| Industry selection | `industry` | Sends the canonical key shown below |
+| Required privacy acknowledgement | `consent: true` | This records acceptance of the demo notice; unchecked submission is rejected |
+| Optional product updates | `marketingOptIn` | Boolean, unchecked by default; independent of notice acknowledgement |
+| Hidden website field | `company_website` | Backend honeypot; a filled value is answered generically and does not send an email |
+| Fixed campaign tag | `utm_source: "marketing-website"` | Stored only through the backend's supported UTM field handling |
 
-The browser sends a UUID in `Idempotency-Key`. Duplicate submits are disabled in the UI; the application must enforce idempotency across server instances and retries.
+| Display label | Backend industry key |
+| --- | --- |
+| Real estate | `real_estate` |
+| Healthcare | `healthcare` |
+| Home services | `home_services` |
+| Marketing or creative agency | `agency` |
+| Consulting | `consulting` |
+| Legal or financial services | `legal_finance` |
+| Local services | `local_services` |
+| Ecommerce | `ecommerce` |
+| Other | `other` |
 
-## Configurable application endpoint
+The required notice checkbox is separate from the optional marketing checkbox. The form links the required acknowledgement to `/privacy` and sends `consent: true` only when checked.
 
-Set `IACQUIREOS_DEMO_REGISTER_URL` to the exact registration route supplied by the application team. The landing project intentionally does not guess that route. Set `IACQUIREOS_BACKEND_SIGNING_SECRET` to a unique random secret shared with the application server; it must contain at least 32 bytes and must never use a `NEXT_PUBLIC_` variable.
+## Signed server-to-server request
 
-The Next.js server forwards a normalized request body:
+The landing server serializes the backend JSON once. It signs and sends the same string as UTF-8 bytes.
 
-```json
-{
-  "fullName": "Ada Lovelace",
-  "email": "ada@example.com",
-  "businessName": "Analytical Engines",
-  "industry": "B2B SaaS",
-  "marketingConsent": false,
-  "source": "marketing-website"
-}
-```
+Headers:
 
-It sends these headers:
-
-| Header | Value |
+| Header | Required value |
 | --- | --- |
 | `Content-Type` | `application/json` |
 | `Accept` | `application/json` |
-| `Origin` | Origin of the marketing site request; validate against an application allowlist |
-| `Idempotency-Key` | Browser-generated UUID, or a server-generated UUID if invalid/missing |
-| `X-IAcquire-Timestamp` | Unix time in seconds from the landing server |
-| `X-IAcquire-Signature` | `sha256=` plus lowercase hex HMAC-SHA256 of `${timestamp}\n${exactRawBody}` |
+| `Origin` | `https://iacquire-os.vercel.app` in production; must be allowlisted by the application |
+| `IACQUIREOS-Request-Id` | `[A-Za-z0-9_-]{16,64}`; a 32-character random hexadecimal ID |
+| `IACQUIREOS-Timestamp` | Unix seconds |
+| `IACQUIREOS-Signature` | `t=<timestamp>,v1=<64 lowercase hex characters>` |
 
-The application must reject stale timestamps (recommended maximum age: five minutes), compare signatures in constant time, validate the origin and payload independently, enforce distributed IP/email rate limits and abuse controls, and make the registration idempotent. It must not trust the landing page as a substitute for its own validation.
+The signature is HMAC-SHA256 with the shared secret and this exact message:
 
-## Application behavior required
+    <timestamp>.<requestId>.<rawBody>
 
-1. Validate the signature, timestamp, origin allowlist, JSON schema, idempotency key, and rate limits.
-2. Create or update a pending record in the existing Demo & Prospects service. Do not create a client workspace or grant customer permissions.
-3. Treat repeat requests for an existing prospect as the same public outcome to prevent email enumeration. Do not return prospect details.
-4. Send the verification email through the existing authorized email provider. Return `202` with `{"status":"accepted"}` only when the request has been accepted for email delivery. Do not return verification tokens or links to the marketing site.
-5. Generate the unique, expiring verification link using the configured canonical application origin, currently intended to be `https://iacquire.online`. Do not hardcode an unconfirmed route in the marketing project.
-6. A verification-link `GET` must display a secure entry page without consuming the token or activating the demo. Link scanners, previews, refreshes, and email delivery must not start the timer.
-7. On an explicit protected `POST` confirmation, validate and consume the token, establish the authenticated demo session, and atomically set `first_access_at` only if it is null. Set `expires_at = first_access_at + 24 hours` using database/server time. Repeat access, resends, devices, and refreshes must not reset either value.
-8. Enforce the existing one-allocation policy, four-step guided experience, ten-message quota, persistent return access, consultation path, optional verified checkout, and expiry behavior. Only Super Admin may extend an allocation.
-9. Provide a controlled resend for expired verification links that does not consume an allocation or start/reset demo time.
-10. Never log full verification URLs, tokens, secrets, or submitted personal data. Keep email-enumeration responses generic.
+A representative body is:
 
-## Response contract
+    {"name":"Ada Lovelace","email":"ada@example.com","business":"Analytical Engines","industry":"consulting","consent":true,"marketingOptIn":false,"utm_source":"marketing-website","company_website":""}
 
-Accepted registration:
+The browser creates one compact idempotency key per serialized form attempt. The server normalizes legacy dashed UUID keys by removing their dashes before using them as the backend request ID. The HMAC secret stays in server environment variables and never reaches browser code.
 
-```http
-HTTP/1.1 202 Accepted
-Content-Type: application/json
-Cache-Control: no-store
-```
+## Responses and privacy
 
-```json
-{"status":"accepted"}
-```
+The backend accepts a registration only with HTTP `202` and JSON `{"ok":true}`. The landing route requires both conditions before showing the inbox confirmation. Existing prospects and new prospects receive the same accepted result from the backend to prevent email enumeration.
 
-Return the same accepted response for a new or already-registered address. The landing endpoint maps that to a generic confirmation. For overload, return `429` with an optional bounded `Retry-After`. For temporary unavailability, return a generic `5xx`; do not include stack traces or provider responses.
-
-## Local mock mode
-
-`DEMO_REGISTRATION_MODE=mock` is available only outside production. It exercises validation and the success UI, returns `mode: "mock"`, and clearly tells the user that no email was sent. It creates no prospect, token, demo session, or countdown. Production mock mode is rejected.
-
-## Email template
-
-See [docs/demo-verification-email.html](docs/demo-verification-email.html). The application should render escaped variables, insert its own verification URL and actual link-expiry time, and send the message through its existing email service. The email explains that verification-link expiry is separate from the 24-hour demo period.
-
-## App-side changes needed
-
-- Add the signed registration handler to the existing prospect service and expose its actual route to this project owner.
-- Configure the exact allowed marketing origin after that domain is chosen.
-- Share a new server-only HMAC secret through the deployment secret store.
-- Enforce schema validation, distributed abuse controls, idempotency, duplicate-safe responses, and safe logs in the app.
-- Use the existing email provider and provide the expiring verification email/controlled resend behavior.
-- Keep `GET` token access non-consuming; activate only on explicit protected confirmation and atomically set the first-access timestamps.
-- Confirm the app's actual verification route and template-variable contract before production deployment.
-- Run the full integrated journey in an isolated test environment: registration → email capture → verification view → explicit first entry → 24-hour expiry → return access.
-
-## Current integration status
-
-| Area | Status |
+| Backend response | Landing behavior |
 | --- | --- |
-| Landing form and same-origin route | Implemented locally |
-| Validation, CSRF boundary, payload limit, signed BFF request | Implemented locally |
-| Local mock adapter | Implemented locally; no email is sent |
-| Existing application endpoint | Not integrated; route and app repository unavailable |
-| Email provider and actual verification link | Not verified |
-| First-access activation and 24-hour timer | App-side contract only; not tested here |
-| Production marketing origin / canonical URL | Not configured |
+| `202 {"ok":true}` | Return generic accepted confirmation |
+| `400`, `401`, `403`, unexpected status/body | Return a generic temporary-unavailability response; do not show success |
+| `409` | Return a non-success conflict message; never treat it as a duplicate registration |
+| `422` | Map supported backend field errors to the matching form fields |
+| `429` | Show a generic rate-limit message and preserve a bounded `Retry-After` |
+| `503` | Show a generic temporary-unavailability message and preserve a bounded `Retry-After` |
+
+The landing route never returns backend error details, provider responses, secrets, or prospect data to the browser.
+
+## Retry and timeout behavior
+
+The backend keeps a request-ID ledger. Reusing the same ID and exact body returns `202` without another email; reusing the ID with a different body returns `409`. The backend documentation says an unfinished claim can be taken over after two minutes and refused or transiently failed requests release their ID.
+
+The landing route makes one automatic retry only when the network call throws or times out. Both calls reuse the same request ID, timestamp, signature, headers, and exact serialized body. It does not retry HTTP error responses. A visitor retry after a timeout reuses the same compact request ID and browser body while the fields are unchanged; editing the form creates a new logical attempt. Each new server request uses a fresh timestamp and matching signature.
+
+The per-call timeout is 13 seconds, above the backend email provider's documented 10-second ceiling. The route allows up to 30 seconds for the two bounded calls. `409`, `422`, `429`, and `503` are not hidden as success.
+
+## Environment configuration
+
+Marketing-site Vercel project:
+
+    NEXT_PUBLIC_SITE_URL=https://iacquire-os.vercel.app
+    NEXT_PUBLIC_APP_ORIGIN=https://www.iacquire.online
+    IACQUIREOS_DEMO_REGISTER_URL=https://www.iacquire.online/api/public/demo/register
+    IACQUIREOS_BACKEND_SIGNING_SECRET=<server-only-shared-secret>
+    DEMO_REGISTRATION_MODE=backend
+    DEMO_REGISTRATION_TIMEOUT_MS=13000
+
+The secret must be a unique value of at least 32 random bytes. Store it only as the server-side `IACQUIREOS_BACKEND_SIGNING_SECRET` in the marketing project and as `DEMO_REGISTRATION_SIGNING_SECRET` in the application project.
+
+Application environment/configuration:
+
+    DEMO_REGISTRATION_SIGNING_SECRET=<same-server-only-shared-secret>
+    DEMO_REGISTRATION_ALLOWED_ORIGINS=https://iacquire-os.vercel.app
+
+The application must also have its demo registration feature enabled and email delivery configured. For staging integration tests, configure its capture email provider and an isolated staging database; do not use the production email provider or production prospect store.
+
+`.env.example` contains public endpoint/origin defaults and an empty secret value. Add the secret in Vercel's server environment; never commit it or place it in a `NEXT_PUBLIC_*` variable.
+
+## Verification status and remaining work
+
+The landing validation, request mapping, request ID, HMAC header, timeout retry, response mapping, browser form state, and mock mode are covered by local tests using an isolated fake backend response. The Playwright web server is pinned to mock mode and sends no email.
+
+No staging credentials or capture-mail backend are present in this workspace. The integration has therefore **not** been exercised against a real isolated application server. Email capture, repeated verification-link GET, explicit verification, first-entry 24-hour activation, ten-message quota, return access, and server-side expiry still require the application's staging environment and a controlled synthetic `@example.test` address. Production form submission and real email delivery have not been attempted.

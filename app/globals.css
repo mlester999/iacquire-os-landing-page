@@ -1982,7 +1982,7 @@ img {
   border-radius: 10px;
   background: rgba(79, 140, 255, 0.08);
   color: #91b7ff;
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 900;
 }
 
@@ -1993,13 +1993,13 @@ img {
 
 .form-heading b {
   color: #e5edf8;
-  font-size: 14px;
+  font-size: 16px;
 }
 
 .form-heading small {
   margin-top: 2px;
   color: #8192aa;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .form-status-error {
@@ -2009,7 +2009,7 @@ img {
   border-radius: 9px;
   background: rgba(251, 113, 133, 0.07);
   color: #ff9aaa;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .form-grid {
@@ -2027,7 +2027,7 @@ img {
 
 .form-field label {
   color: #becbdd;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 750;
 }
 
@@ -2079,7 +2079,7 @@ img {
 
 .field-error {
   color: #ff9aaa;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .honeypot {
@@ -2095,18 +2095,47 @@ img {
   align-items: flex-start;
   gap: 9px;
   margin-top: 16px;
-  color: #8d9db2;
+  color: #aab9cb;
   cursor: pointer;
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 15px;
+  line-height: 1.55;
 }
 
 .consent-row input {
-  width: 15px;
-  height: 15px;
+  width: 18px;
+  height: 18px;
   flex: 0 0 auto;
-  margin: 0;
+  margin: 2px 0 0;
   accent-color: var(--blue);
+}
+
+.privacy-acknowledgement {
+  margin-top: 15px;
+}
+
+.privacy-acknowledgement .consent-row {
+  margin-top: 0;
+}
+
+.consent-row.is-required > span > span {
+  color: #75b4ff;
+}
+
+.consent-detail {
+  margin: 5px 0 0 27px;
+  color: #8fa1b8;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.consent-detail a {
+  color: #a4c4fa;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.marketing-opt-in {
+  margin-top: 14px;
 }
 
 .submit-button {
@@ -2130,7 +2159,7 @@ img {
 .privacy-disclosure {
   margin: 12px 0 0;
   color: #72839a;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
 }
 
@@ -2184,7 +2213,7 @@ img {
   display: block;
   margin-top: 15px;
   color: #7d9e90;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.55;
 }
 

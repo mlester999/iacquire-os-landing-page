@@ -18,9 +18,22 @@ To exercise the form without credentials, set `DEMO_REGISTRATION_MODE=mock` in `
 
 ## Configure the existing app integration
 
-See [INTEGRATION_CONTRACT.md](INTEGRATION_CONTRACT.md) for the request signature, payload, response, security boundary, first-entry timer requirements, and app-side work. Set `IACQUIREOS_DEMO_REGISTER_URL` to the actual endpoint supplied by the app team and `IACQUIREOS_BACKEND_SIGNING_SECRET` to a unique secret installed in the app's server-side secret store. Do not expose it as a public frontend variable. The marketing domain is not finalized; set `NEXT_PUBLIC_SITE_URL` only when it is selected so canonical, Open Graph URL, and sitemap values are correct.
+The landing page calls the application endpoint at `https://www.iacquire.online/api/public/demo/register` through its same-origin Next.js route. It maps the form values to the app's canonical industry keys and payload, signs the exact JSON string with the documented HMAC format, and verifies the app's `202 {"ok":true}` response. See [INTEGRATION_CONTRACT.md](INTEGRATION_CONTRACT.md) for headers, retries, responses, and the app-side environment settings.
 
-The existing app repository and endpoint were not available in this workspace. Real registration, email delivery, verification, first activation, demo expiry, and provider delivery remain unverified.
+Set these values in the marketing site's Vercel project:
+
+```text
+NEXT_PUBLIC_SITE_URL=https://iacquire-os.vercel.app
+NEXT_PUBLIC_APP_ORIGIN=https://www.iacquire.online
+IACQUIREOS_DEMO_REGISTER_URL=https://www.iacquire.online/api/public/demo/register
+IACQUIREOS_BACKEND_SIGNING_SECRET=<server-only-shared-secret>
+DEMO_REGISTRATION_MODE=backend
+DEMO_REGISTRATION_TIMEOUT_MS=13000
+```
+
+Generate a unique shared secret with at least 32 random bytes. Store it as `IACQUIREOS_BACKEND_SIGNING_SECRET` in the marketing Vercel project and as `DEMO_REGISTRATION_SIGNING_SECRET` in the application server's secret store. On the application, set `DEMO_REGISTRATION_ALLOWED_ORIGINS=https://iacquire-os.vercel.app`. Never put the secret in a `NEXT_PUBLIC_*` variable, commit it, or expose it to browser code.
+
+The backend implementation was inspected on `mlester999/iacquire-dashboard` `master` at `b82b241bdcd176bb67687fc2c501c176a2404e53`. The local adapter and browser flow are tested against isolated mocks; this workspace has no staging backend credentials, so registration email capture, verification, first-entry timing, message quota, return access, and expiry were not exercised end to end.
 
 ## Commands
 
@@ -32,7 +45,7 @@ npm run test:e2e
 npm run build
 ```
 
-`npm run test:e2e` launches a local Next.js test server with the isolated mock mode enabled. It checks the page at 320, 375, 390, 430, 768, 1024, 1280, and 1440 px, tests the mobile menu, registration validation and mock acceptance, and keyboard use of the portfolio filters and project dialog. It also refreshes the before/after screenshots in `artifacts/screenshots/` from the supplied HTML and the migrated page.
+`npm run test:e2e` launches a local Next.js test server with the isolated mock mode enabled. It checks the page at 320, 375, 390, 430, 768, 1024, 1280, and 1440 px, tests the mobile menu, privacy acknowledgement, canonical industry values, stable browser retry IDs, mock acceptance, and keyboard use of the portfolio filters and project dialog. It also refreshes the before/after screenshots in `artifacts/screenshots/` from the supplied HTML and the migrated page. The test server never calls the application or sends email.
 
 ## Design and migration files
 
@@ -58,10 +71,11 @@ The full-page captures and first-screen previews are saved under [`artifacts/scr
 | --- | --- |
 | Next.js landing page and responsive layouts | Implemented locally |
 | Demo registration UI and same-origin API client | Implemented locally |
-| Server-side validation, origin checks, HMAC forwarding, payload limit, timeout handling | Implemented locally |
+| Server-side validation, same-origin checks, backend HMAC headers, exact payload mapping, payload limit, and idempotent timeout retry | Implemented locally; covered with an isolated backend-response stub |
 | Local mock mode | Implemented and tested locally; sends no email |
-| App registration endpoint | Not integrated; application repository/endpoint unavailable |
-| Email provider | Not verified |
-| 24-hour first-confirmed-entry activation | Documented as an app-side contract; not end-to-end tested |
-| Production domain, canonical URL, deployment | Not configured; deployment approval required |
+| Application registration endpoint | Contract matched against the current application `master` source; hosted staging request not run |
+| Email provider and captured verification email | Not tested; requires isolated backend credentials and capture provider |
+| 24-hour first-confirmed-entry activation, ten-message quota, return access, and expiry | Application-owned; not end-to-end tested from this workspace |
+| Production environment variables | Values documented in `.env.example`; add them to Vercel and configure the matching application allowlist/secret |
+| Production deployment | Not deployed; deployment approval required |
 | Desktop/mobile screenshots | Before/after full-page and first-screen captures saved under `artifacts/screenshots/` |

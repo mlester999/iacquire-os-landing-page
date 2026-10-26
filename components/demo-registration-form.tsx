@@ -4,7 +4,7 @@ import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import { ArrowRightIcon, CheckIcon } from "@/components/icons";
 import { INDUSTRIES, validateDemoRegistration, type RegistrationData } from "@/lib/demo-validation.mjs";
 
-type FormValues = RegistrationData;
+type FormValues = Omit<RegistrationData, "consent"> & { consent: boolean };
 type FormStatus =
   | { kind: "idle" }
   | { kind: "error"; message: string }
@@ -16,18 +16,18 @@ const initialValues: FormValues = {
   email: "",
   businessName: "",
   industry: "" as FormValues["industry"],
-  marketingConsent: false,
+  consent: false,
+  marketingOptIn: false,
 };
 
 function createIdempotencyKey() {
   const webCrypto = globalThis.crypto as Crypto & { randomUUID?: () => string };
-  if (typeof webCrypto.randomUUID === "function") return webCrypto.randomUUID();
+  if (typeof webCrypto.randomUUID === "function") return webCrypto.randomUUID().replaceAll("-", "");
   const bytes = new Uint8Array(16);
   webCrypto.getRandomValues(bytes);
   bytes[6] = (bytes[6] & 0x0f) | 0x40;
   bytes[8] = (bytes[8] & 0x3f) | 0x80;
-  const hex = Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
-  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
 }
 
 export function DemoRegistrationForm() {
@@ -35,7 +35,7 @@ export function DemoRegistrationForm() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [status, setStatus] = useState<FormStatus>({ kind: "idle" });
   const [pending, setPending] = useState(false);
-  const idempotencyKey = useRef<string | null>(null);
+  const pendingAttempt = useRef<{ idempotencyKey: string; body: string } | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   function updateValue<K extends keyof FormValues>(key: K, value: FormValues[K]) {
@@ -48,7 +48,6 @@ export function DemoRegistrationForm() {
     });
     if (status.kind === "error") {
       setStatus({ kind: "idle" });
-      idempotencyKey.current = null;
     }
   }
 
@@ -67,19 +66,25 @@ export function DemoRegistrationForm() {
     setFieldErrors({});
     setStatus({ kind: "idle" });
     setPending(true);
-    idempotencyKey.current ??= createIdempotencyKey();
+    const companyWebsite =
+      formRef.current?.querySelector<HTMLInputElement>('[name="company_website"]')?.value ?? "";
+    const requestBody = JSON.stringify({ ...validation.data, company_website: companyWebsite });
+    if (!pendingAttempt.current || pendingAttempt.current.body !== requestBody) {
+      pendingAttempt.current = { idempotencyKey: createIdempotencyKey(), body: requestBody };
+    }
+    const attempt = pendingAttempt.current!;
 
     try {
       const response = await fetch("/api/demo/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Idempotency-Key": idempotencyKey.current,
+          "Idempotency-Key": attempt.idempotencyKey,
         },
-        body: JSON.stringify({ ...validation.data, website: "" }),
+        body: attempt.body,
       });
       const result = await response.json().catch(() => null) as
-        | { status?: string; mode?: string; message?: string; fieldErrors?: Record<string, string> }
+        | { ok?: boolean; mode?: string; message?: string; fieldErrors?: Record<string, string> }
         | null;
 
       if (!response.ok) {
@@ -91,18 +96,18 @@ export function DemoRegistrationForm() {
         return;
       }
 
-      if (result?.status !== "accepted") {
+      if (result?.ok !== true) {
         setStatus({ kind: "error", message: "We could not confirm the request. Please try again." });
         return;
       }
 
-      idempotencyKey.current = null;
+      pendingAttempt.current = null;
       if (result.mode === "mock") {
         setStatus({ kind: "mock", message: result.message || "Local mock registration accepted. No email was sent." });
       } else {
         setStatus({
           kind: "success",
-          message: result.message || "Check your email. We’ve sent you a secure link to access your personalized iAcquireOS demo.",
+          message: result.message || "If your request can proceed, we’ll send a secure iAcquireOS demo link to your work email.",
         });
       }
     } catch {
@@ -122,7 +127,7 @@ export function DemoRegistrationForm() {
         <span className="success-icon"><CheckIcon /></span>
         <div>
           <span className="eyebrow">{isMock ? "Local test mode" : "Next step"}</span>
-          <h3>{isMock ? "Form path confirmed." : "Check your inbox."}</h3>
+          <h3>{isMock ? "Form path confirmed." : "Request received."}</h3>
           <p>{status.message}</p>
           {!isMock ? <small>Your 24-hour demo window begins only after you confirm your first entry in iAcquireOS.</small> : null}
         </div>
@@ -154,24 +159,31 @@ export function DemoRegistrationForm() {
           <label htmlFor="industry">Industry <span aria-hidden="true">*</span></label>
           <select id="industry" name="industry" required value={values.industry} aria-invalid={Boolean(fieldErrors.industry)} aria-describedby={fieldErrors.industry ? "industry-error" : undefined} onChange={(event: ChangeEvent<HTMLSelectElement>) => updateValue("industry", event.target.value as FormValues["industry"])}>
             <option value="" disabled>Select your industry</option>
-            {INDUSTRIES.map((industry) => <option value={industry} key={industry}>{industry}</option>)}
+            {INDUSTRIES.map((industry) => <option value={industry.value} key={industry.value}>{industry.label}</option>)}
           </select>
           {fieldErrors.industry ? <small id="industry-error" className="field-error">{fieldErrors.industry}</small> : null}
         </div>
       </div>
       <div className="honeypot" aria-hidden="true">
-        <label htmlFor="website">Website</label>
-        <input id="website" name="website" type="text" tabIndex={-1} autoComplete="off" value="" readOnly />
+        <label htmlFor="company_website">Website</label>
+        <input id="company_website" name="company_website" type="text" tabIndex={-1} autoComplete="off" defaultValue="" />
       </div>
-      <label className="consent-row" htmlFor="marketingConsent">
-        <input id="marketingConsent" name="marketingConsent" type="checkbox" checked={values.marketingConsent} onChange={(event) => updateValue("marketingConsent", event.target.checked)} />
-        <span>Send me occasional iAcquireOS product updates. This is optional and separate from my demo link.</span>
+      <div className="privacy-acknowledgement">
+        <label className="consent-row is-required" htmlFor="consent">
+          <input id="consent" name="consent" type="checkbox" required checked={values.consent} aria-invalid={Boolean(fieldErrors.consent)} aria-describedby={fieldErrors.consent ? "consent-error" : "consent-details"} onChange={(event) => updateValue("consent", event.target.checked)} />
+          <span>I have read and acknowledge the demo privacy notice. <span aria-hidden="true">*</span></span>
+        </label>
+        <p id="consent-details" className="consent-detail">This notice explains how your details are used to prepare demo access. <a href="/privacy">Read the privacy notice</a>.</p>
+        {fieldErrors.consent ? <small id="consent-error" className="field-error">{fieldErrors.consent}</small> : null}
+      </div>
+      <label className="consent-row marketing-opt-in" htmlFor="marketingOptIn">
+        <input id="marketingOptIn" name="marketingOptIn" type="checkbox" checked={values.marketingOptIn} onChange={(event) => updateValue("marketingOptIn", event.target.checked)} />
+        <span>Email me occasional iAcquireOS product updates. This is optional and separate from my demo request.</span>
       </label>
-      {fieldErrors.marketingConsent ? <small className="field-error">{fieldErrors.marketingConsent}</small> : null}
       <button className="button button-primary submit-button" type="submit" disabled={pending}>
         {pending ? <><span className="loading-spinner" aria-hidden="true" /> Sending secure request…</> : <>Send me the demo link <ArrowRightIcon /></>}
       </button>
-      <p className="privacy-disclosure">By submitting, you ask iAcquireOS to use these details to prepare demo access and send a transactional verification link. Marketing messages are sent only if you opt in. <a href="/privacy">Read the privacy notice</a>.</p>
+      <p className="privacy-disclosure">We use your details to process your demo request and send a transactional verification link. Promotional messages are sent only if you opt in above.</p>
     </form>
   );
 }

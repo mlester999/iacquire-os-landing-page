@@ -112,20 +112,84 @@ test("registration validates required fields and accepts an isolated mock reques
   await form.getByRole("button", { name: /Send me the demo link/i }).click();
   await expect(page.locator(".form-status-error")).toContainText("Check the highlighted fields");
   await expect(page.getByLabel("Full name")).toHaveAttribute("aria-invalid", "true");
+  await expect(page.getByLabel(/I have read and acknowledge/i)).toHaveAttribute("aria-invalid", "true");
 
   await page.getByLabel("Full name").fill("Test Person");
   await page.getByLabel("Work email").fill("person@example.com");
   await page.getByLabel("Business name").fill("Example Studio");
-  await page.getByLabel("Industry").selectOption("Professional services");
+  await page.getByLabel("Industry").selectOption("consulting");
+  await page.getByLabel(/I have read and acknowledge/i).check();
+  await expect(page.getByLabel("Email me occasional iAcquireOS product updates")).not.toBeChecked();
   const registrationResponse = page.waitForResponse((response) => response.url().includes("/api/demo/register"));
   await form.getByRole("button", { name: /Send me the demo link/i }).click();
   const response = await registrationResponse;
   expect(response.status()).toBe(202);
   const result = await response.json();
-  expect(result).toMatchObject({ status: "accepted", mode: "mock" });
+  expect(result).toMatchObject({ ok: true, mode: "mock" });
 
   await expect(page.getByRole("status")).toContainText("Form path confirmed.");
   await expect(page.getByRole("status")).toContainText("No email was sent.");
+});
+
+test("browser retries preserve one request ID and the exact form body", async ({ page }) => {
+  const attempts: Array<{ requestId: string | undefined; body: string | null }> = [];
+  await page.route("**/api/demo/register", async (route) => {
+    attempts.push({
+      requestId: route.request().headers()["idempotency-key"],
+      body: route.request().postData(),
+    });
+    if (attempts.length === 1) {
+      await route.fulfill({
+        status: 503,
+        contentType: "application/json",
+        body: JSON.stringify({ ok: false, message: "Demo registration is temporarily unavailable. Please try again." }),
+      });
+      return;
+    }
+    await route.fulfill({
+      status: 202,
+      contentType: "application/json",
+      body: JSON.stringify({ ok: true, mode: "backend", message: "If your request can proceed, we’ll send a secure demo link." }),
+    });
+  });
+
+  await page.goto("/#demo");
+  await page.getByLabel("Full name").fill("Test Person");
+  await page.getByLabel("Work email").fill("person@example.com");
+  await page.getByLabel("Business name").fill("Example Studio");
+  await page.getByLabel("Industry").selectOption("real_estate");
+  await page.getByLabel(/I have read and acknowledge/i).check();
+
+  const submit = page.locator(".demo-form").getByRole("button", { name: /Send me the demo link/i });
+  await submit.click();
+  await expect(page.locator(".form-status-error")).toContainText("temporarily unavailable");
+  await submit.click();
+  await expect(page.getByRole("status")).toContainText("Request received.");
+
+  expect(attempts).toHaveLength(2);
+  expect(attempts[0].requestId).toMatch(/^[A-Za-z0-9_-]{16,64}$/);
+  expect(attempts[0].requestId).not.toContain("-");
+  expect(attempts[1]).toEqual(attempts[0]);
+  expect(JSON.parse(attempts[0].body ?? "{}")).toMatchObject({
+    fullName: "Test Person",
+    email: "person@example.com",
+    businessName: "Example Studio",
+    industry: "real_estate",
+    consent: true,
+    marketingOptIn: false,
+    company_website: "",
+  });
+});
+
+test("privacy and marketing controls remain readable and usable on mobile and tablet", async ({ page }) => {
+  for (const width of [375, 768]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/#demo");
+    await expect(page.getByLabel(/I have read and acknowledge/i)).toBeVisible();
+    await expect(page.getByRole("link", { name: "Read the privacy notice" })).toBeVisible();
+    await expect(page.getByLabel("Email me occasional iAcquireOS product updates")).toBeVisible();
+    await expect(page.locator(".submit-button")).toBeVisible();
+  }
 });
 
 test("registration shows safe retry guidance when the endpoint fails", async ({ page }) => {
@@ -140,7 +204,8 @@ test("registration shows safe retry guidance when the endpoint fails", async ({ 
   await page.getByLabel("Full name").fill("Test Person");
   await page.getByLabel("Work email").fill("person@example.com");
   await page.getByLabel("Business name").fill("Example Studio");
-  await page.getByLabel("Industry").selectOption("Professional services");
+  await page.getByLabel("Industry").selectOption("consulting");
+  await page.getByLabel(/I have read and acknowledge/i).check();
   await page.locator(".demo-form").getByRole("button", { name: /Send me the demo link/i }).click();
 
   await expect(page.locator(".form-status-error")).toContainText("temporarily unavailable");
