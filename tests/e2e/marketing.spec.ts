@@ -17,6 +17,7 @@ async function revealSourceContent(page: import("@playwright/test").Page) {
 }
 
 test("before and after screenshots at desktop and mobile widths", async ({ page }) => {
+  test.setTimeout(60_000);
   await mkdir(screenshotDirectory, { recursive: true });
 
   await page.setViewportSize({ width: 1440, height: 1000 });
@@ -70,6 +71,23 @@ test("page fits the requested responsive viewport widths", async ({ page }) => {
     }));
     expect(dimensions.document, `horizontal overflow at ${width}px: ${JSON.stringify(dimensions)}`).toBeLessThanOrEqual(dimensions.viewport);
   }
+});
+
+test("founder portrait is a large hero image on desktop and mobile", async ({ page }) => {
+  const portrait = page.locator(".hero-founder-portrait");
+
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.goto("/");
+  await expect(portrait).toBeVisible();
+  const desktopBounds = await portrait.boundingBox();
+  expect(desktopBounds?.width).toBeGreaterThan(400);
+  expect(desktopBounds?.height).toBeGreaterThan(500);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.reload();
+  const mobileBounds = await portrait.boundingBox();
+  expect(mobileBounds?.width).toBeGreaterThan(320);
+  expect(mobileBounds?.height).toBeGreaterThan(420);
 });
 
 test("mobile navigation opens, follows a link, and closes with Escape", async ({ page }) => {

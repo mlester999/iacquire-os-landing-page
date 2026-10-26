@@ -299,7 +299,7 @@ export function FounderSection() {
         <div className="founder-layout">
           <article className="founder-card">
             <div className="founder-photo-wrap">
-              <Image src="/images/argel-platon-in-car.jpg" width={768} height={1369} alt="Argel Platon, founder of iAcquireOS, seated in a car" sizes="(max-width: 800px) 100vw, 390px" />
+              <Image src="/images/argel-platon-portrait.jpg" width={913} height={1200} alt="Argel Platon, founder of iAcquireOS, seated outdoors in the Philippines" sizes="(max-width: 800px) 100vw, 390px" />
               <span className="portrait-location"><i /> Based in the Philippines</span>
             </div>
             <div className="founder-card-copy"><span className="eyebrow">Founder · GTM</span><h3>Argel Platon</h3><p>Building the positioning, acquisition strategy, client journey, and team-backed operation behind iAcquireOS.</p><div className="founder-links"><a href="https://www.linkedin.com/in/argelplaton/" target="_blank" rel="noreferrer">Connect on LinkedIn <ArrowUpRightIcon /></a><a href="mailto:argelplaton.ai@gmail.com">Send an email <ArrowUpRightIcon /></a></div></div>
