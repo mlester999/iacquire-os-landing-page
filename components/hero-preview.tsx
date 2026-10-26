@@ -18,7 +18,7 @@ export function HeroPreview() {
           loading="eager"
         />
         <figcaption className="hero-portrait-caption">
-          <span>Founder-led · iAcquireOS</span>
+          <span>Founder-led</span>
           <b>Argel Platon</b>
           <small>Based in the Philippines</small>
         </figcaption>
