@@ -13,9 +13,9 @@ export function DemoSection() {
     <section className="section-pad section-demo" id="demo">
       <div className="container">
         <SectionHeading
-          eyebrow="Start with the free demo"
-          title={<>See the system in action, <span className="gradient-text">then decide.</span></>}
-          description="Request personalized access to the existing iAcquireOS demo. Your demo allocation and access remain managed by the application."
+          eyebrow="Start with the risk-free step"
+          title={<>See iAcquireOS working for <span className="gradient-text">your business.</span></>}
+          description="Book a free demo. We’ll show you the acquisition system, how it could fit your workflow, and what would need to happen to deploy it. If you don’t like it, walk away for free."
         />
         <div className="demo-layout">
           <div className="demo-info-card">

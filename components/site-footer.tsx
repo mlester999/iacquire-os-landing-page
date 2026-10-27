@@ -13,7 +13,7 @@ export function SiteFooter() {
               <span className="brand-mark" aria-hidden="true">iA</span>
               <span className="brand-name">iAcquire<span>OS</span><small>by Argel Platon</small></span>
             </a>
-            <p className="footer-description">A connected acquisition system for high-ticket B2B businesses.</p>
+            <p className="footer-description">Founder-led • Team-backed • Performance-aligned</p>
           </div>
           <div className="footer-links">
             <div>

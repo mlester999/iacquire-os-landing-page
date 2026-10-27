@@ -5,26 +5,26 @@ import { SiteHeader } from "@/components/site-header";
 import { getSiteUrl } from "@/lib/site";
 
 const description =
-  "A founder-led client acquisition system connecting lead research, qualification, booking, CRM follow-up, and customer operations for high-ticket B2B businesses.";
+  "iAcquireOS by Argel Platon — a founder-led AI client acquisition system for high-ticket B2B SaaS companies and agencies.";
 const siteUrl = getSiteUrl();
 
 export const metadata: Metadata = {
   ...(siteUrl ? { metadataBase: siteUrl, alternates: { canonical: "/" } } : {}),
   title: {
-    default: "iAcquireOS by Argel Platon | Client Acquisition System",
+    default: "iAcquireOS by Argel Platon — Client Acquisition System",
     template: "%s | iAcquireOS",
   },
   description,
   openGraph: {
     ...(siteUrl ? { url: siteUrl } : {}),
-    title: "iAcquireOS by Argel Platon | Client Acquisition System",
+    title: "iAcquireOS by Argel Platon — Client Acquisition System",
     description,
     type: "website",
     siteName: "iAcquireOS",
   },
   twitter: {
     card: "summary_large_image",
-    title: "iAcquireOS by Argel Platon | Client Acquisition System",
+    title: "iAcquireOS by Argel Platon — Client Acquisition System",
     description,
   },
   robots: { index: true, follow: true },

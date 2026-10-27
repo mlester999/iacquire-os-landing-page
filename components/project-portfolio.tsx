@@ -42,10 +42,10 @@ export function ProjectPortfolio() {
       <div className="container">
         <SectionHeading
           eyebrow="Selected work"
-          title={<>Systems and products <span className="gradient-text">we’ve built.</span></>}
-          description="A selection of AI systems, automations, and digital products from previous and ongoing projects. Each example is attributed to its own product."
+          title="Systems & Products We’ve Built"
+          description="AI systems, automations, and digital products we’ve built for previous and ongoing clients/businesses. Browse the full project archive and open each detailed case study."
         />
-        <div className="portfolio-note"><span className="note-mark"><CheckIcon /></span><p>Project examples are shown as portfolio work. They are not iAcquireOS product screenshots or performance claims.</p></div>
+        <div className="portfolio-note"><span className="note-mark"><CheckIcon /></span><p>Project examples and status are from the Automate with Marky portfolio. They are not iAcquireOS product screenshots or performance claims. Case-study links open the full project write-up.</p></div>
         <div className="portfolio-filters" role="group" aria-label="Filter project examples">
           {categories.map((category) => (
             <button
@@ -78,6 +78,7 @@ export function ProjectPortfolio() {
               <span className="project-content">
                 <span className="project-title-row"><b>{project.name}</b><ArrowUpRightIcon /></span>
                 <span className="project-summary">{project.summary}</span>
+                <span className="project-status">{project.status}</span>
                 <span className="tag-row">{project.tags.slice(0, 3).map((tag) => <span className="tag" key={tag}>{tag}</span>)}</span>
               </span>
             </button>
@@ -103,14 +104,17 @@ export function ProjectPortfolio() {
           {selectedProject ? (
             <div className="dialog-inner">
               <button ref={closeButtonRef} className="dialog-close" type="button" aria-label="Close project details" onClick={() => setSelectedProject(null)}>×</button>
-              <span className="eyebrow">{selectedProject.category} · selected build</span>
+              <span className="eyebrow">{selectedProject.category} · {selectedProject.status}</span>
               <h3 id="project-dialog-title">{selectedProject.name}</h3>
-              <p>{selectedProject.summary}</p>
-              <ul className="dialog-details">
-                {selectedProject.details.map((detail) => <li key={detail}><CheckIcon />{detail}</li>)}
-              </ul>
-              <div className="tag-row dialog-tags">{selectedProject.tags.map((tag) => <span className="tag" key={tag}>{tag}</span>)}</div>
-              <p className="dialog-note">This project example is separate from the iAcquireOS demo.</p>
+              <p>{selectedProject.description}</p>
+              <div className="project-result"><span className="eyebrow">Result</span><p>{selectedProject.result}</p></div>
+              <div className="tag-row dialog-tags">
+                {[...new Set([...selectedProject.sourceCategories, ...selectedProject.tags])].map((tag) => <span className="tag" key={tag}>{tag}</span>)}
+              </div>
+              <a className="project-case-study-link" href={selectedProject.caseStudyUrl} target="_blank" rel="noreferrer">
+                Read the full case study <ArrowUpRightIcon />
+              </a>
+              <p className="dialog-note">This project is separate from the iAcquireOS demo.</p>
             </div>
           ) : null}
         </dialog>

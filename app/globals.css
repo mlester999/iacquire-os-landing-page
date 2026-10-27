@@ -721,10 +721,11 @@ img {
 }
 
 .problem-card > p {
-  min-height: 72px;
+  min-height: 114px;
   margin: 0;
   color: #9aaac0;
-  font-size: 12px;
+  font-size: 15px;
+  line-height: 1.65;
 }
 
 .problem-detail {
@@ -770,6 +771,14 @@ img {
   font-size: 22px;
   font-weight: 810;
   letter-spacing: -0.04em;
+}
+
+.journey-head p {
+  max-width: 720px;
+  margin: 8px 0 0;
+  color: #91a2ba;
+  font-size: 15px;
+  line-height: 1.6;
 }
 
 .journey-status {
@@ -884,7 +893,7 @@ img {
 
 .value-strip {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 10px;
   margin-top: 13px;
 }
@@ -926,8 +935,8 @@ img {
 .value-strip small {
   margin-top: 3px;
   color: #8091a8;
-  font-size: 12px;
-  line-height: 1.4;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .module-grid {
@@ -1226,7 +1235,7 @@ img {
 .project-card {
   display: flex;
   min-width: 0;
-  min-height: 240px;
+  min-height: 280px;
   flex-direction: column;
   overflow: hidden;
   padding: 0;
@@ -1312,8 +1321,8 @@ img {
 
 .project-title-row b {
   color: #e0eafb;
-  font-size: 12px;
-  line-height: 1.4;
+  font-size: 15px;
+  line-height: 1.45;
 }
 
 .project-title-row svg {
@@ -1327,8 +1336,15 @@ img {
   display: block;
   margin-top: 8px;
   color: #8c9eb5;
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
+}
+
+.project-status {
+  margin-top: 9px;
+  color: #9bb4d6;
+  font-size: 12px;
+  font-weight: 750;
 }
 
 .tag-row {
@@ -1432,6 +1448,37 @@ img {
 }
 
 .dialog-tags { margin: 0; padding: 0; }
+
+.project-result {
+  margin-top: 17px;
+  padding: 15px 16px;
+  border: 1px solid rgba(69, 224, 173, 0.14);
+  border-radius: 12px;
+  background: rgba(69, 224, 173, 0.035);
+}
+
+.project-result .eyebrow { color: #83cbb1; }
+
+.project-result p {
+  margin: 7px 0 0;
+  color: #d1e8de;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.project-case-study-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  color: #a8c8ff;
+  font-size: 15px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.project-case-study-link:hover { color: #e1ecff; }
+.project-case-study-link svg { width: 16px; height: 16px; }
 
 .dialog-note {
   margin-top: 17px !important;
@@ -1775,7 +1822,7 @@ img {
 .accountability-grid p {
   margin: 5px 0 0;
   color: #8799af;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.55;
 }
 
@@ -1809,8 +1856,38 @@ img {
 
 .experience-row span {
   color: #8293a9;
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.5;
+}
+
+.founder-capabilities {
+  margin-top: 16px;
+  padding: 17px 18px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.018);
+}
+
+.founder-capability-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 11px;
+}
+
+.founder-capability-list span {
+  padding: 7px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+  color: #bac8da;
+  font-size: 14px;
+}
+
+.founder-capabilities > p {
+  margin: 12px 0 0;
+  color: #8394aa;
+  font-size: 14px;
 }
 
 .section-demo {
@@ -2482,6 +2559,7 @@ img {
   .module-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .module-card { min-height: 220px; }
   .project-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .value-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 920px) {
@@ -2596,7 +2674,7 @@ img {
   .project-card { min-height: 190px; }
   .project-emblem { min-height: 58px; }
   .project-content { padding: 14px; }
-  .project-summary { font-size: 13px; }
+  .project-summary { font-size: 14px; }
   .tag { font-size: 12px; }
   .portfolio-note { align-items: flex-start; padding: 11px; }
   .portfolio-note p { font-size: 13px; }

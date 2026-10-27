@@ -8,22 +8,19 @@ const problems = [
     number: "01",
     label: "B2B SaaS founders",
     title: "The founder is still the sales team.",
-    body: "A valuable offer can have a real pipeline before it is ready for a full sales organization.",
-    detail: "Inbound reaches the founder, outbound is inconsistent, and slow follow-up can let interest cool.",
+    body: "With $2,000–$10,000+ average contract values, the business is valuable enough to need a real pipeline — but not always ready to justify a formal sales organization.",
   },
   {
     number: "02",
     label: "High-ticket agencies",
     title: "Referrals create a feast-or-famine cycle.",
-    body: "Good months can still be followed by gaps when referrals are the main source of new conversations.",
-    detail: "A steady acquisition process makes the pipeline easier to see and work.",
+    body: "Agencies charging $3,000–$10,000+/month often depend heavily on referrals instead of operating a predictable acquisition engine.",
   },
   {
     number: "03",
     label: "Both segments",
     title: "The tools exist. The system doesn’t.",
-    body: "Spreadsheets, calendars, a separate CRM, and scattered automations can leave the handoffs disconnected.",
-    detail: "The goal is clear ownership from first signal through the next customer step.",
+    body: "Spreadsheets, Calendly, a separate CRM and scattered automations create disconnected steps. Leads get delayed, duplicated, forgotten or lost.",
   },
 ];
 
@@ -60,11 +57,28 @@ const tools = [
 ];
 
 const processSteps = [
-  { number: "01", title: "Build", body: "Define the target customer and the acquisition workflow." },
-  { number: "02", title: "Use", body: "Put the agreed flow into practice in a controlled scope." },
-  { number: "03", title: "Measure", body: "Track leads, qualification, appointments, and customer outcomes." },
-  { number: "04", title: "Document", body: "Record the workflow, results, lessons, and open work." },
-  { number: "05", title: "Deploy", body: "Move forward with the parts that are ready and verified." },
+  { number: "01", title: "Deploy", body: "Deploy the acquisition system around the target ICP." },
+  { number: "02", title: "Run", body: "Run the system on iAcquireOS before scaling the offer." },
+  { number: "03", title: "Track", body: "Track leads, qualification, appointments and acquired clients." },
+  { number: "04", title: "Capture", body: "Capture the workflow, results, lessons and proof." },
+  { number: "05", title: "Bring", body: "Bring the proven operating model to qualified clients." },
+];
+
+const founderCapabilities = [
+  "Client Communication",
+  "Customer Experience",
+  "Lead Generation",
+  "Appointment Setting",
+  "Sales Operations",
+  "AI Automation",
+  "GoHighLevel",
+  "n8n",
+  "Make",
+  "CRM Workflows",
+  "AI Agents",
+  "Business Systems",
+  "Project Coordination",
+  "Personal Branding",
 ];
 
 const questions = [
@@ -98,7 +112,7 @@ export function HeroSection() {
         <div className="hero-copy">
           <span className="eyebrow"><span className="eyebrow-dot" /> AI-powered client acquisition system</span>
           <h1>If you’re still manually handling leads, <span className="gradient-text">you don’t have a sales system.</span></h1>
-          <p className="hero-description">iAcquireOS connects lead research, qualification, follow-up, booking, and conversion support into one clear acquisition flow for high-ticket B2B businesses.</p>
+          <p className="hero-description">iAcquireOS is built for high-ticket B2B companies that have a valuable offer but no predictable sales engine — turning lead capture, qualification, follow-up, booking and conversion into one connected acquisition system.</p>
           <div className="hero-actions">
             <a className="button button-primary" href="#demo">Try Free Demo <ArrowRightIcon /></a>
             <a className="button button-outline" href="#system">Explore the system <ArrowUpRightIcon /></a>
@@ -130,8 +144,8 @@ export function ProblemSection() {
       <div className="container">
         <SectionHeading
           eyebrow="The revenue gap"
-          title={<>Build around a <span className="gradient-text">repeatable system,</span> not manual effort.</>}
-          description="You do not necessarily need a large sales department. You need the speed, follow-up, qualification, and visibility a sales process is meant to provide."
+          title="When client acquisition depends on manual work, you’re building a business around effort instead of a system."
+          description="You don’t necessarily need a huge sales department. You need the speed, follow-up, qualification and visibility that a sales department is supposed to provide."
         />
         <div className="problem-grid">
           {problems.map((problem) => (
@@ -139,7 +153,6 @@ export function ProblemSection() {
               <div className="problem-top"><span>{problem.number}</span><small>{problem.label}</small></div>
               <h3>{problem.title}</h3>
               <p>{problem.body}</p>
-              <div className="problem-detail"><b>Typical situation</b><span>{problem.detail}</span></div>
             </article>
           ))}
         </div>
@@ -155,10 +168,10 @@ export function SystemSection() {
         <SectionHeading
           eyebrow="The iAcquireOS approach"
           title={<>One connected acquisition <span className="gradient-text">operating system.</span></>}
-          description="Instead of adding another isolated tool, iAcquireOS is designed to connect the critical handoffs between finding a prospect and supporting a customer."
+          description="Instead of adding another isolated tool, iAcquireOS connects the critical stages between finding a prospect and creating a customer."
         />
         <div className="journey-card">
-          <div className="journey-head"><div><span className="tiny-label">THE PIPELINE FLOW</span><h3>From first signal to next step.</h3></div><span className="journey-status"><i /> One connected journey</span></div>
+          <div className="journey-head"><div><span className="tiny-label">THE PIPELINE FLOW</span><h3>The machine behind the pipeline.</h3><p>Lead data, AI outreach, qualification, appointment booking, CRM movement and conversion support are designed to work as one flow.</p></div><span className="journey-status"><i /> One connected journey</span></div>
           <div className="journey-flow">
             {journey.map((step, index) => (
               <div className="journey-step" key={step.number}>
@@ -172,9 +185,10 @@ export function SystemSection() {
           <div className="journey-foot"><span><SparkIcon /> People review sensitive actions and customer commitments.</span><a href="#system-overview">See how each stage works <ArrowRightIcon /></a></div>
         </div>
         <div className="value-strip">
-          <div><span className="value-icon"><CheckIcon /></span><p><b>Speed-to-lead</b><small>Respond and route opportunities promptly.</small></p></div>
-          <div><span className="value-icon"><CheckIcon /></span><p><b>Qualification before the calendar</b><small>Collect fit details before a sales conversation.</small></p></div>
-          <div><span className="value-icon"><CheckIcon /></span><p><b>One source of truth</b><small>Keep status, ownership, communication, and meetings connected.</small></p></div>
+          <div><span className="value-icon"><CheckIcon /></span><p><b>Speed-to-lead</b><small>Respond and route opportunities quickly instead of waiting for a founder to notice an inbox notification.</small></p></div>
+          <div><span className="value-icon"><CheckIcon /></span><p><b>Lead qualification</b><small>Collect the information needed to determine whether a prospect is worth a sales conversation.</small></p></div>
+          <div><span className="value-icon"><CheckIcon /></span><p><b>Connected pipeline</b><small>Keep lead status, ownership, communication and appointments connected instead of scattered across tools.</small></p></div>
+          <div><span className="value-icon"><CheckIcon /></span><p><b>Customer economics</b><small>Designed around businesses where one additional customer can materially change the economics of the system.</small></p></div>
         </div>
       </div>
     </section>
@@ -187,8 +201,8 @@ export function SystemOverviewSection() {
       <div className="container">
         <SectionHeading
           eyebrow="Inside the system"
-          title={<>Four operating modules. <span className="gradient-text">One journey.</span></>}
-          description="The workflow is designed to support the customer path—from finding relevant opportunities to helping customers after a sale."
+          title={<>Four stages. <span className="gradient-text">One connected journey.</span></>}
+          description="A closer look at how iAcquireOS is designed to support the customer journey—from finding relevant opportunities to supporting customers after the sale."
         />
         <div className="module-grid">
           {modules.map((module) => (
@@ -219,12 +233,12 @@ export function SystemOverviewSection() {
         </div>
 
         <div className="stack-card">
-          <div className="stack-intro"><span className="eyebrow">Connected tools</span><h3>Technology chosen for the workflow.</h3><p>Tools depend on the implementation. Some integrations still need activation and end-to-end testing before they can be described as live.</p></div>
+          <div className="stack-intro"><span className="eyebrow">Connected tools</span><h3>The technology behind the workflow.</h3><p>Tools are connected according to the functions needed for the implementation.</p></div>
           <div className="stack-list">
             {tools.map((tool) => <div className="stack-row" key={tool.name}><span className="stack-bullet"><CheckIcon /></span><span><b>{tool.name}</b><small>{tool.detail}</small></span></div>)}
           </div>
         </div>
-        <p className="status-caveat"><span className="status-caveat-dot" /> Built in stages. Integrations and workflows are tested before they are promised as live.</p>
+        <p className="status-caveat"><span className="status-caveat-dot" /> The system overview describes the intended architecture and the current build at different stages of completion. Some integrations and workflows still require testing, activation, and end-to-end quality assurance before they can be presented as fully operational.</p>
       </div>
     </section>
   );
@@ -235,9 +249,9 @@ export function ProcessSection() {
     <section className="section-pad section-process" id="process">
       <div className="container">
         <SectionHeading
-          eyebrow="How implementation works"
-          title={<>A practical path from plan <span className="gradient-text">to deployment.</span></>}
-          description="Keep the scope visible, verify the handoffs, and move forward with what is ready for the business."
+          eyebrow="The proof in the process"
+          title="You’re experiencing the point."
+          description="From the moment you land here, you’re experiencing the same acquisition process we’re building for our clients. If you explore, qualify, and book a demo, you’ve just become a lead generated through the system. If this system can move you from visitor → prospect → qualified lead → booked conversation, you’re seeing what it was built to do."
         />
         <div className="process-track">
           {processSteps.map((step) => (
@@ -257,8 +271,8 @@ export function OfferSection() {
       <div className="container">
         <SectionHeading
           eyebrow="The investment"
-          title={<>Start with implementation. <span className="gradient-text">Add support if you need it.</span></>}
-          description="Try the existing demo first. A consultation helps determine the workflow and scope before any purchase decision."
+          title="One-time implementation. No monthly retainer."
+          description="The offer is designed around implementation and performance alignment rather than locking the client into another perpetual service bill."
         />
         <div className="offer-grid">
           <article className="offer-card offer-card-primary">
@@ -281,7 +295,7 @@ export function OfferSection() {
             <a className="button button-outline" href="#contact">Ask about a consultation <ArrowUpRightIcon /></a>
           </article>
         </div>
-        <p className="offer-footnote">The consultation is the main sales-conversion step after the demo. Direct purchase is optional.</p>
+        <p className="offer-footnote">That means building it, putting it to work, measuring what happens, and using the evidence to improve the next deployment. The consultation is the main sales-conversion step after the demo; direct purchase is optional.</p>
       </div>
     </section>
   );
@@ -292,9 +306,9 @@ export function FounderSection() {
     <section className="section-pad section-founder" id="founder">
       <div className="container">
         <SectionHeading
-          eyebrow="Founder accountability"
+          eyebrow="One relationship. One accountable person."
           title={<>One relationship. <span className="gradient-text">One accountable person.</span></>}
-          description="Personal branding is not decoration here. It makes it clear who owns the relationship and who is responsible for the work."
+          description="Personal branding is not decoration here. It changes who owns the relationship when something goes wrong."
         />
         <div className="founder-layout">
           <article className="founder-card">
@@ -302,22 +316,28 @@ export function FounderSection() {
               <Image src="/images/argel-platon-portrait.jpg" width={913} height={1200} alt="Argel Platon, founder of iAcquireOS, seated outdoors in the Philippines" sizes="(max-width: 800px) 100vw, 390px" />
               <span className="portrait-location"><i /> Based in the Philippines</span>
             </div>
-            <div className="founder-card-copy"><span className="eyebrow">Founder · GTM</span><h3>Argel Platon</h3><p>Building the positioning, acquisition strategy, client journey, and team-backed operation behind iAcquireOS.</p><div className="founder-links"><a href="https://www.linkedin.com/in/argelplaton/" target="_blank" rel="noreferrer">Connect on LinkedIn <ArrowUpRightIcon /></a><a href="mailto:argelplaton.ai@gmail.com">Send an email <ArrowUpRightIcon /></a></div></div>
+            <div className="founder-card-copy"><span className="eyebrow">Founder · GTM</span><h3>Argel Platon</h3><p>Founder-led positioning, client acquisition, customer experience and business development — supported by a specialized AI development and operations team.</p><div className="founder-links"><a href="https://www.linkedin.com/in/argelplaton/" target="_blank" rel="noreferrer">Connect on LinkedIn <ArrowUpRightIcon /></a><a href="mailto:argelplaton.ai@gmail.com">Send an email <ArrowUpRightIcon /></a></div></div>
           </article>
           <div className="accountability-column">
-            <div className="accountability-quote"><span className="quote-mark">“</span><p>You message one person, get handed to a sales rep, then account management, then someone you have never met—and nobody feels like the person who truly owns the outcome.</p><b>iAcquireOS keeps that relationship close to the founder.</b></div>
+            <div className="accountability-quote"><span className="quote-mark">“</span><p>You message one person, get handed to a sales rep, then account management, then a VA you’ve never met — and nobody feels like the person who truly owns the outcome.</p><b>iAcquireOS collapses that chain.</b></div>
             <div className="accountability-grid">
-              <div><b>The person you meet</b><p>Stays connected to the client relationship.</p></div>
-              <div><b>The person accountable</b><p>Has a direct reason to care when communication breaks.</p></div>
-              <div><b>A team-backed operation</b><p>Specialized AI, development, and operations work supports delivery.</p></div>
-              <div><b>Experience in service</b><p>Customer communication across phone, chat, and email.</p></div>
+              <div><b>The person you meet</b><p>The person you meet is the founder. The person you can hold accountable is the founder. The reputation attached to the outcome is the founder’s.</p></div>
+              <div><b>Connected after the sale</b><p>The founder stays connected to the relationship instead of disappearing after the sale.</p></div>
+              <div><b>Founder accountability</b><p>The founder has a direct reason to care when the system underperforms or communication breaks.</p></div>
+              <div><b>Visible accountability</b><p>Personal brand creates a visible accountability layer that faceless delivery models don’t provide.</p></div>
+              <div><b>Specialized team</b><p>The founder is not pretending to do every technical task. Specialized AI, development and operations work is handled by a team.</p></div>
             </div>
           </div>
         </div>
         <div className="experience-row">
-          <div><small>2024–2026</small><b>T-Mobile · Customer Service</b><span>Phone-based support, communication, and high-volume customer interactions.</span></div>
-          <div><small>2023–2024</small><b>Booking.com · Customer Service</b><span>Chat, email, and call support focused on issue resolution and customer experience.</span></div>
-          <div><small>Current</small><b>iAcquireOS · Founder / GTM</b><span>Positioning, acquisition strategy, client journey, personal brand, and team-backed operations.</span></div>
+          <div><small>2024–2026</small><b>T-Mobile — Customer Service</b><span>Fast-paced phone-based customer support, communication, problem solving and high-volume customer interactions.</span></div>
+          <div><small>2023–2024</small><b>Booking.com — Customer Service</b><span>Customer support through chat, email and calls, with a focus on communication, issue resolution and customer experience.</span></div>
+          <div><small>Current</small><b>iAcquireOS — Founder / GTM</b><span>Building the positioning, acquisition strategy, client journey, personal brand and team-backed operation.</span></div>
+        </div>
+        <div className="founder-capabilities">
+          <span className="eyebrow">Core capabilities</span>
+          <div className="founder-capability-list">{founderCapabilities.map((capability) => <span key={capability}>{capability}</span>)}</div>
+          <p>Upwork and Fiverr profile links will be added soon.</p>
         </div>
       </div>
     </section>
@@ -349,14 +369,14 @@ export function FinalCtaSection() {
       <div className="container">
         <div className="final-cta-card">
           <div className="cta-decoration" aria-hidden="true"><span /><span /><span /></div>
-          <span className="eyebrow">Start with a real conversation</span>
-          <h2>See if iAcquireOS fits <span className="gradient-text">your business.</span></h2>
-          <p>Try the personalized demo first. Then talk with Argel about your goals, the workflow, and what implementation would involve.</p>
+          <span className="eyebrow">Get started</span>
+          <h2>Try the demo. <span className="gradient-text">Then let’s talk.</span></h2>
+          <p>Experience the iAcquireOS client acquisition system for free, then book an appointment with Argel to discuss whether it fits your business.</p>
           <div className="final-cta-actions">
             <a className="button button-primary" href="#demo">Try Free Demo <ArrowRightIcon /></a>
             <a className="button button-outline" href={whatsapp} target="_blank" rel="noreferrer">Book Free Consultation <ArrowUpRightIcon /></a>
           </div>
-          <small>No purchase required to try the demo.</small>
+          <small>One-time implementation · No monthly retainer · Commission tied to acquired clients</small>
         </div>
       </div>
     </section>
