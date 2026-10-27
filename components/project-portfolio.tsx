@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { ArrowUpRightIcon, CheckIcon } from "@/components/icons";
-import { portfolioProjects, type PortfolioProject } from "@/lib/projects";
+import { portfolioProjectImages, portfolioProjects, type PortfolioProject } from "@/lib/projects";
 import { SectionHeading } from "@/components/section-heading";
 
 const categories = ["All", "AI Automation", "AI Agents", "SaaS", "Shopify", "Workflow"] as const;
@@ -63,7 +64,7 @@ export function ProjectPortfolio() {
           Showing {visibleProjects.length} of {filteredProjects.length} {filter === "All" ? "project examples" : `${filter} examples`}
         </p>
         <div className="project-grid">
-          {visibleProjects.map((project, index) => (
+          {visibleProjects.map((project) => (
             <button
               type="button"
               key={project.name}
@@ -71,9 +72,14 @@ export function ProjectPortfolio() {
               aria-haspopup="dialog"
               onClick={() => setSelectedProject(project)}
             >
-              <span className={`project-emblem emblem-${index % 4}`} aria-hidden="true">
-                <span>{project.name.slice(0, 1)}</span>
-                <small>{project.category}</small>
+              <span className="project-preview" aria-hidden="true">
+                <Image
+                  src={portfolioProjectImages[project.id]}
+                  alt=""
+                  fill
+                  sizes="(max-width: 520px) calc(100vw - 32px), (max-width: 700px) 45vw, (max-width: 1200px) 30vw, 380px"
+                />
+                <span className="project-preview-category">{project.category}</span>
               </span>
               <span className="project-content">
                 <span className="project-title-row"><b>{project.name}</b><ArrowUpRightIcon /></span>
@@ -104,6 +110,14 @@ export function ProjectPortfolio() {
           {selectedProject ? (
             <div className="dialog-inner">
               <button ref={closeButtonRef} className="dialog-close" type="button" aria-label="Close project details" onClick={() => setSelectedProject(null)}>×</button>
+              <div className="project-dialog-image">
+                <Image
+                  src={portfolioProjectImages[selectedProject.id]}
+                  alt={`${selectedProject.name} project preview`}
+                  fill
+                  sizes="(max-width: 560px) calc(100vw - 64px), 500px"
+                />
+              </div>
               <span className="eyebrow">{selectedProject.category} · {selectedProject.status}</span>
               <h3 id="project-dialog-title">{selectedProject.name}</h3>
               <p>{selectedProject.description}</p>
