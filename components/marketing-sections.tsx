@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { ArrowRightIcon, ArrowUpRightIcon, CheckIcon, SparkIcon } from "@/components/icons";
-import { HeroPreview } from "@/components/hero-preview";
+import { HeroFounderPortrait } from "@/components/hero-founder-portrait";
 import { SectionHeading } from "@/components/section-heading";
 
 const problems = [
@@ -106,23 +106,30 @@ const questions = [
 
 export function HeroSection() {
   return (
-    <section className="hero-section" id="home">
-      <div className="hero-glow" aria-hidden="true" />
-      <div className="container hero-grid">
-        <div className="hero-copy">
-          <span className="eyebrow"><span className="eyebrow-dot" /> AI-powered client acquisition system</span>
-          <h1>If you’re still manually handling leads, <span className="gradient-text">you don’t have a sales system.</span></h1>
-          <p className="hero-description">iAcquireOS is built for high-ticket B2B companies that have a valuable offer but no predictable sales engine — turning lead capture, qualification, follow-up, booking and conversion into one connected acquisition system.</p>
-          <div className="hero-actions">
-            <a className="button button-primary" href="#demo">Try Free Demo <ArrowRightIcon /></a>
-            <a className="button button-outline" href="#system">Explore the system <ArrowUpRightIcon /></a>
+    <section className="reference-hero" id="home">
+      <div className="container reference-hero-container">
+        <div className="reference-hero-grid">
+          <div className="reference-hero-copy">
+            <span className="reference-hero-eyebrow">AI-Powered Client Acquisition System</span>
+            <h1>If you&apos;re still manually handling leads, <span className="reference-hero-gradient">you don&apos;t have a sales system.</span></h1>
+            <p>iAcquireOS is built for high-ticket B2B companies that have a valuable offer but no predictable sales engine — turning lead capture, qualification, follow-up, booking and conversion into one connected acquisition system.</p>
+            <div className="reference-demo-hook">
+              <b>See it working before you commit.</b>
+              <span>Test the system for your own business. If you don&apos;t like it, walk away for free.</span>
+            </div>
+            <div className="reference-hero-actions">
+              <a className="button button-primary" href="#demo">Test the Free Demo <span aria-hidden="true">→</span></a>
+              <a className="button button-outline" href="#problem">See if you&apos;re a fit</a>
+            </div>
+            <div className="reference-hero-micro">
+              <span>One-time implementation</span>
+              <span>No monthly retainer</span>
+              <span>Commission tied to acquired clients</span>
+            </div>
           </div>
-          <div className="hero-points" aria-label="Product highlights">
-            <span><CheckIcon /> See the system before you decide</span>
-            <span><CheckIcon /> Human review for sensitive actions</span>
-          </div>
+          <HeroFounderPortrait />
         </div>
-        <div className="hero-visual"><HeroPreview /><HeroStatRow /></div>
+        <HeroStatRow />
       </div>
     </section>
   );
@@ -130,10 +137,11 @@ export function HeroSection() {
 
 function HeroStatRow() {
   return (
-    <div className="hero-stat-row" aria-label="iAcquireOS workflow facts">
-      <div><b>5</b><span>connected stages</span></div>
-      <div><b>4</b><span>operating modules</span></div>
-      <div><b>6</b><span>specialized AI Employees</span></div>
+    <div className="reference-hero-statbar" aria-label="Business and system facts">
+      <div className="reference-hero-stat"><b>$2K–$10K+</b><span>Target SaaS ACV</span></div>
+      <div className="reference-hero-stat"><b>$3K–$10K+/mo</b><span>Target agency retainers</span></div>
+      <div className="reference-hero-stat"><b>$120K+/yr</b><span>In-house sales team problem</span></div>
+      <div className="reference-hero-stat"><b>1 system</b><span>Connected acquisition flow</span></div>
     </div>
   );
 }
