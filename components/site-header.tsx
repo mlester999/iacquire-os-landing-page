@@ -1,22 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRightIcon, MenuIcon } from "@/components/icons";
 
 const navigation = [
-  { href: "#system", label: "The system" },
-  { href: "#work", label: "Selected work" },
+  { href: "#problem", label: "Revenue Gap" },
+  { href: "#system", label: "iAcquireOS" },
+  { href: "#system-overview", label: "Difference" },
+  { href: "#process", label: "Why Worth the Trust?" },
+  { href: "#work", label: "View Built Projects" },
   { href: "#pricing", label: "Investment" },
-  { href: "#founder", label: "About" },
+  { href: "#founder", label: "About Argel" },
+  { href: "#faq", label: "FAQs" },
+  { href: "#contact", label: "Get started" },
 ];
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const menuToggleRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!menuOpen) return;
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMenuOpen(false);
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        menuToggleRef.current?.focus();
+      }
     };
     document.addEventListener("keydown", closeOnEscape);
     return () => document.removeEventListener("keydown", closeOnEscape);
@@ -27,9 +36,8 @@ export function SiteHeader() {
   return (
     <header className="site-header">
       <div className="nav-wrap container">
-        <a className="brand" href="#home" aria-label="iAcquireOS by Argel Platon, home" onClick={closeMenu}>
-          <span className="brand-mark" aria-hidden="true">iA</span>
-          <span className="brand-name">iAcquire<span>OS</span><small>by Argel Platon</small></span>
+        <a className="brand nav-brand" href="#home" aria-label="iAcquireOS by Argel Platon, home" onClick={closeMenu}>
+          <span>iAcquireOS <em>by Argel Platon</em></span>
         </a>
 
         <nav id="primary-navigation" className={`primary-nav${menuOpen ? " is-open" : ""}`} aria-label="Primary navigation">
@@ -39,11 +47,12 @@ export function SiteHeader() {
             </a>
           ))}
           <a className="button button-primary nav-cta" href="#demo" onClick={closeMenu}>
-            Try Free Demo <ArrowRightIcon />
+            Test the Free Demo <ArrowRightIcon />
           </a>
         </nav>
 
         <button
+          ref={menuToggleRef}
           className="menu-toggle"
           type="button"
           aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
