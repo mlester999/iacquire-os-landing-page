@@ -277,7 +277,7 @@ img {
   align-items: center;
   flex: 1 1 auto;
   justify-content: flex-end;
-  gap: clamp(8px, 0.7vw, 10px);
+  gap: clamp(13px, 1.1vw, 18px);
   color: #a7b5ca;
   font-size: 12px;
   font-weight: 650;
@@ -288,7 +288,68 @@ img {
   transition: color 160ms ease;
 }
 
-.primary-nav > a:not(.button):hover {
+.primary-nav > a:not(.button):hover,
+.nav-more > summary:hover {
+  color: #fff;
+}
+
+.nav-more {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.nav-more > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  list-style: none;
+  transition: color 160ms ease;
+}
+
+.nav-more > summary::-webkit-details-marker { display: none; }
+
+.nav-more-caret {
+  width: 6px;
+  height: 6px;
+  margin-top: -3px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform 160ms ease;
+}
+
+.nav-more[open] .nav-more-caret {
+  margin-top: 3px;
+  transform: rotate(225deg);
+}
+
+.nav-more-menu {
+  position: absolute;
+  z-index: 110;
+  top: calc(100% + 13px);
+  right: -14px;
+  display: grid;
+  min-width: 170px;
+  padding: 7px;
+  border: 1px solid var(--line-strong);
+  border-radius: 13px;
+  background: #080e1a;
+  box-shadow: 0 18px 36px rgba(0, 0, 0, 0.34);
+}
+
+.nav-more-menu a {
+  display: flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: #a7b5ca;
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.nav-more-menu a:hover {
+  background: rgba(255, 255, 255, 0.06);
   color: #fff;
 }
 
@@ -2579,6 +2640,24 @@ img {
     padding: 10px 0;
     border-bottom: 1px solid rgba(255, 255, 255, 0.055);
   }
+  .nav-more { width: 100%; }
+  .nav-more > summary {
+    display: flex;
+    min-height: 46px;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.055);
+  }
+  .nav-more-menu {
+    position: static;
+    min-width: 0;
+    padding: 4px 0 8px 14px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  .nav-more-menu a { min-height: 42px; padding: 8px 10px; }
   .primary-nav .nav-cta { margin-top: 14px; }
 }
 
